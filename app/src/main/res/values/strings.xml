@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="my_rental">My Rental</string>
+    <string name="noWhiteSpace">(?=\\S+$)</string>
 </resources>
