@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
@@ -13,6 +14,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
     Button GoToSignUpBtn, login_btn;
@@ -37,13 +44,7 @@ public class Login extends AppCompatActivity {
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validateUsername() & validatePassword()) {
-                    // Continue with login process
-                    // You may want to check the username and password against your authentication logic
-                    // If successful, navigate to the next screen
-                    Intent intent = new Intent(Login.this, Dashboard.class);
-                    startActivity(intent);
-                }
+                isUser();
             }
         });
 
@@ -68,40 +69,105 @@ public class Login extends AppCompatActivity {
     }
 
     private boolean validateUsername() {
-        String usernameInput = username.getEditText().getText().toString().trim();
+        String val = username.getEditText().getText().toString();
+        String noSpace = "\\A\\w{4,20}\\z";
 
-        if (usernameInput.isEmpty()) {
-            username.setError("Field can't be empty");
+        if (val.isEmpty()) {
+            username.setError("field cannot be empty");
             return false;
+        } else if (val.length() >= 15) {
+            username.setError("Username too long");
+            return false;
+
+        } else if (!val.matches(noSpace)) {
+            username.setError("No white spaces allowed");
+            return false;
+
         } else {
             username.setError(null);
+            username.setErrorEnabled(false);
             return true;
         }
     }
 
     private boolean validatePassword() {
-        String passwordInput = password.getEditText().getText().toString().trim();
 
-        String val = password.getEditText().getText().toString();
-        String passwordVal = "^" +
-                //"(?=.*[0-9])" +         //at least 1 digit
-                //"(?=.*[a-z])" +         //at least 1 lower case letter
-                //"(?=.*[A-Z])" +         //at least 1 upper case letter
-                "(?=.*[a-zA-Z])" +      //any letter
-                "(?=.*[@#$%^&+=.])" +    //at least 1 special character
-                "(?=\\S+$)" +           //no white spaces
-                ".{4,}" +               //at least 4 characters
-                "$";
+        String val = password.getEditText().getText().toString().trim();
+
 
         if (val.isEmpty()) {
             password.setError("field cannot be empty");
             return false;
-        } else if (!val.matches(passwordVal)) {
-            password.setError("Password is too weak");
-            return false;
-        }else {
+        } else {
             password.setError(null);
             return true;
         }
+    }
+
+    public void loginUser(View view) {
+
+        if (!validateUsername() && validatePassword()) {
+            return;
+        } else {
+            isUser();
+        }
+    }
+
+    private void isUser() {
+        String usernameEnteredVal = username.getEditText().getText().toString().trim();
+        String passwordEnteredVal = password.getEditText().getText().toString().trim();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+
+        Query checkUser = reference.orderByChild("username").equalTo(usernameEnteredVal);
+        checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists()){
+
+                    username.setError(null);
+                    username.setErrorEnabled(false);
+
+                    String passwordFromDB = snapshot.child(usernameEnteredVal).child("password").getValue(String.class);
+
+                    if(passwordFromDB.equals(passwordEnteredVal)){
+
+                        password.setError(null);
+                        password.setErrorEnabled(false);
+
+                        String fullnameFromDB = snapshot.child(usernameEnteredVal).child("fullname").getValue(String.class);
+                        String usernameFromDB = snapshot.child(usernameEnteredVal).child("username").getValue(String.class);
+                        String phoneFromDB = snapshot.child(usernameEnteredVal).child("phone").getValue(String.class);
+                        String emailFromDB = snapshot.child(usernameEnteredVal).child("email").getValue(String.class);
+
+                        Intent intent = new Intent(getApplicationContext(),UserProfile.class);
+
+                        intent.putExtra("name",fullnameFromDB);
+                        intent.putExtra("username",usernameFromDB);
+                        intent.putExtra("phone",phoneFromDB);
+                        intent.putExtra("email",emailFromDB);
+                        intent.putExtra("password",passwordFromDB);
+
+                        startActivity(intent);
+
+                    }else {
+                        password.setError("Wrong password");
+                        password.requestFocus();
+                    }
+                }else{
+                    username.setError("User does not exist");
+                    username.requestFocus();
+                }
+
+
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

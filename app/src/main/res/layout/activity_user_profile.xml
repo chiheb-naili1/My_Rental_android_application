@@ -4,39 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
-    android:padding="20dp"
-    tools:context=".SignUp">
+    tools:context=".UserProfile">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
     <ImageView
-        android:id="@+id/image_logo"
         android:layout_width="150dp"
-        android:layout_height="166dp"
-        android:src="@drawable/logo"
-        android:transitionName="logo_image" />
-
+        android:layout_height="150dp"
+        android:src="@drawable/per"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
     <TextView
-        android:id="@+id/logo_name"
-        android:layout_width="wrap_content"
+        android:id="@+id/fullnamelabel"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome!"
-        android:transitionName="logo_name"
-        android:textSize="40sp"
-        android:textColor="#000"
-        android:layout_marginTop="-20dp"
-        android:fontFamily="sans-serif-condensed-medium"/>
-
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:padding="20sp"/>
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/usernamelabel"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sign up to start your journey"
-        android:textSize="18sp"
-        android:textColor="#000"
-        android:transitionName="logo_desc"
-        android:layout_marginTop="5dp"/>
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        />
+    </LinearLayout>
+</LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -124,21 +125,11 @@
             android:layout_marginBottom="5dp"
             android:backgroundTint="#000"
             android:onClick="registerUser"
-            android:text="GO"
+            android:text="UPDATE"
             android:textColor="#fff"
             android:transitionName="button_trans" />
 
-        <Button
-            android:id="@+id/goToLogIn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#00000000"
-            android:text="Already Have An Acounnt? Sign In"
-            android:layout_gravity="right"
-            android:elevation="0dp"
-            android:textColor="#000"
-            android:transitionName="login_signup_trans"
-            android:layout_margin="5dp"/>
+
 
 
 
@@ -146,7 +137,6 @@
 
 
     </LinearLayout>
-
-
 </LinearLayout>
+
 </ScrollView>
